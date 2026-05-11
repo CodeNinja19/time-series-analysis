@@ -1,0 +1,42 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Large derived data — regeneratable from feature_extraction.py / transfer_features.py
+# features_full_comp.csv is 133 MB and exceeds GitHub's 100 MB hard limit.
+# Keep the smaller feature CSVs since they're the ones reproductions need.
+features_full_comp.csv
+features_full_vel.csv
+features.csv
+
+# Extracted raw data (regeneratable from rawdata.7z which IS tracked)
+rawdata/rawdata.csv
+
+# Results directories — these are outputs, regenerate by running pipeline.py
+results/
+results_v2/
+results_v4/
+results_step*/
+results_paper*/
+results_smoke/
+
+# Smoke-test / scratch outputs
+shap_values.csv
+*.log
+
+# OS-specific
+Thumbs.db
