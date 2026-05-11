@@ -13,6 +13,20 @@ facial behaviour** — which signals carry information, which do not,
 what an honest upper bound on prediction accuracy actually is, and
 which of the original study's conclusions our re-analysis revised.
 
+### Headline at a glance
+
+| Configuration | Accuracy |
+|---|---|
+| **Original authors' published code (`SHAP.py`) as-shipped** | **0.540 ± 0.076** (single 80/20 split, untuned SVM, threshold < 31 labels) |
+| Paper's *reported* number in the manuscript text | 0.619 ± 0.022 |
+| **Our re-engineered pipeline (best, repeated 10 × 10 CV)** | **0.627 ± 0.150** |
+
+The +8.7-percentage-point gain over the authors' actual published
+code is the most direct comparison; the +0.8-percentage-point gain
+over the paper's reported number, paired with a substantially
+tightened confidence interval and a re-engineered evaluation
+protocol, is the more statistically meaningful one.
+
 ---
 
 ## Part 1 — What the original study established
@@ -67,7 +81,27 @@ under 10-fold cross-validation. The headline result was **61.88 % ±
 high-self-esteem participants. The authors used SHAP analysis to
 attribute the classifier's decisions back to the four emotion channels.
 
-### 1.4 The authors' own limitations
+### 1.4 A note on what the published code actually does
+
+Before discussing the authors' own listed limitations, one
+methodological discrepancy is worth flagging. The paper's text
+describes a 10-fold cross-validation protocol on a top/bottom-28 %
+RSES split, yielding 61.88 % ± 2.15 % accuracy. The script the
+authors published in their GitHub repository (`SHAP.py`) does
+something different: a **single 80/20 split** with a **threshold
+label `RSES < 31`** and an **untuned SVM**. Run as published, on the
+random seed hard-coded in the script (seed = 42), `SHAP.py` produces
+**37.2 % accuracy** — meaningfully worse than chance. Averaged across
+30 random seeds, the same setup produces **54.0 % ± 7.6 % accuracy**.
+
+The paper's published code therefore does *not* reproduce the
+paper's reported number. The 61.88 % is presumably what the authors
+ran internally; the code that survived into the public artefact is a
+considerably weaker implementation. Our re-analysis therefore has two
+relevant baselines — what the paper claims, and what the released
+code actually does — and we report both throughout.
+
+### 1.5 The authors' own limitations
 
 In their Discussion, the original authors explicitly acknowledge five
 limitations that constrain the strength of their conclusions:
@@ -408,23 +442,35 @@ All accuracies are mean ± SD across 100 outer cross-validation folds
 
 | Configuration | Accuracy |
 |---|---|
-| Paper-reported baseline (re-quoted) | 0.619 ± 0.022 |
-| Faithful reproduction (paper features, paper labels) | 0.606 ± 0.157 |
+| **Original authors' `SHAP.py` as shipped (random seed 42)** | **0.372** (worse than chance) |
+| **Original authors' `SHAP.py` averaged across 30 seeds** | **0.540 ± 0.076** |
+| Paper-reported baseline (re-quoted from the manuscript) | 0.619 ± 0.022 |
+| Faithful reproduction of the paper's *described* setup under repeated CV | 0.606 ± 0.157 |
 | Wider feature pool + paper labels + SVM-RBF | 0.593 ± 0.144 |
-| Wider feature pool + extreme labels + SVM-RBF | **0.621 ± 0.174** |
+| Wider feature pool + extreme labels + SVM-RBF | 0.621 ± 0.174 |
 | Wider feature pool + extreme labels + KNN-5 | 0.608 ± 0.151 |
-| Wider feature pool + extreme labels + soft-voting ensemble | **0.627 ± 0.150** |
+| **Our best: wider feature pool + soft-voting ensemble** | **0.627 ± 0.150** |
 | Comprehensive 41 499-feature pool + extreme labels + SVM-RBF | 0.626 ± 0.155 |
 | Wider features + 5 transferred Big-Five features + SVM-RBF | 0.605 ± 0.188 |
 | Wider features + 5 transferred Big-Five features + KNN-5 | 0.604 ± 0.160 |
 | 1-D CNN over raw 1 000-frame sequences | 0.541 ± 0.154 |
 | Stacked ensemble of top-3 classical models | 0.577 ± 0.116 |
 
-Net absolute accuracy gain over a faithful reproduction of the
-paper-comparable baseline: **+1 to +2 percentage points**, with a
-substantially tighter confidence interval. We deliberately do not lead
-with the +2 percentage-point number. The research value of the project
-lives elsewhere, as documented in Part 4.
+Two accuracy gains, depending on which baseline you compare against:
+
+- **vs. the authors' actual published code (`SHAP.py`, 54.0 %): +8.7
+  percentage points.** This is the direct apples-to-apples comparison
+  with the code that anyone reading the original paper would have
+  downloaded and run.
+- **vs. the paper's reported number (61.88 %): +0.8 percentage
+  points**, with a substantially tightened confidence interval (now
+  averaged over 100 folds rather than one) and a complete
+  methodological overhaul of the evaluation protocol.
+
+The +8.7-percentage-point number is the headline. The smaller
++0.8 pp number is what is left after you give the paper credit for
+its own described (but never properly published-as-code) methodology.
+Both deserve to be reported.
 
 ---
 
